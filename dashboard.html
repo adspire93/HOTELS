@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Leads Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .filter-grid input,
+        .filter-grid select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .reset-btn {
+            padding: 0.75rem 1.5rem;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: #dc2626;
+        }
+
+        .leads-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .lead-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-top: 4px solid transparent;
+            border-image: linear-gradient(90deg, #667eea, #764ba2) 1;
+        }
+
+        .lead-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .lead-content {
+            padding: 1.5rem;
+        }
+
+        .lead-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .lead-title h3 {
+            color: #333;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .rating {
+            color: #f59e0b;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .star-segment {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .contact-info {
+            margin: 1rem 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .contact-info p {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: start;
+            gap: 0.5rem;
+        }
+
+        .contact-info a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        .about {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .about h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .about p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .emails {
+            margin: 1rem 0;
+        }
+
+        .emails h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .email-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .email-tag {
+            background: #e0e7ff;
+            color: #667eea;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .status-section {
+            margin: 1rem 0;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .status-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .status-select.pending {
+            border-color: #fbbf24;
+            background: #fef3c7;
+        }
+
+        .status-select.contacted {
+            border-color: #60a5fa;
+            background: #dbeafe;
+        }
+
+        .status-select.interested {
+            border-color: #a78bfa;
+            background: #ede9fe;
+        }
+
+        .status-select.converted {
+            border-color: #34d399;
+            background: #d1fae5;
+        }
+
+        .comments {
+            margin-top: 1rem;
+        }
+
+        .comments h4 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .comment-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 0.5rem;
+        }
+
+        .comment {
+            background: #f9fafb;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .comment-time {
+            color: #999;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 60px;
+            margin-bottom: 0.5rem;
+        }
+
+        .add-comment-btn {
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        .add-comment-btn:hover {
+            background: #5568d3;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Hotel Leads Dashboard</h1>
+            <p>Track and manage your hotel leads efficiently</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3 id="total-leads">0</h3>
+                <p>Total Leads</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="contacted">0</h3>
+                <p>Contacted</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="interested">0</h3>
+                <p>Interested</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="converted">0</h3>
+                <p>Converted</p>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-grid">
+                <input type="text" id="search" placeholder="Search hotels...">
+                <select id="status-filter">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="interested">Interested</option>
+                    <option value="converted">Converted</option>
+                </select>
+                <select id="rating-filter">
+                    <option value="0">All Ratings</option>
+                    <option value="4">4+ Stars</option>
+                    <option value="4.5">4.5+ Stars</option>
+                    <option value="5">5 Stars</option>
+                </select>
+                <button class="reset-btn" onclick="resetFilters()">Reset</button>
+            </div>
+        </div>
+
+        <div class="leads-container" id="leads-container"></div>
+    </div>
+
+    <script>
+        let leads = [];
+        let leadStatuses = {};
+        let leadComments = {};
+
+        // Load data from localStorage
+        function loadFromStorage() {
+            const stored = localStorage.getItem('leadStatuses');
+            if (stored) leadStatuses = JSON.parse(stored);
+
+            const storedComments = localStorage.getItem('leadComments');
+            if (storedComments) leadComments = JSON.parse(storedComments);
+        }
+
+        // Save to localStorage
+        function saveToStorage() {
+            localStorage.setItem('leadStatuses', JSON.stringify(leadStatuses));
+            localStorage.setItem('leadComments', JSON.stringify(leadComments));
+        }
+
+        // Load leads from JSON file
+        async function loadLeads() {
+            try {
+                const response = await fetch('hyderabad_hotels_20251114_200657.json');
+                leads = await response.json();
+                loadFromStorage();
+                renderLeads();
+                updateStats();
+            } catch (error) {
+                console.error('Error loading leads:', error);
+                document.getElementById('leads-container').innerHTML =
+                    '<div class="no-results">Error loading leads data</div>';
+            }
+        }
+
+        // Extract emails from the string format
+        function extractEmails(primaryEmail, alternateEmails) {
+            const emails = [];
+
+            if (primaryEmail) {
+                // Clean primary email
+                const cleanPrimary = primaryEmail.split(/[A-Z][a-z]+/)[0].trim();
+                if (cleanPrimary && cleanPrimary.includes('@')) {
+                    emails.push(cleanPrimary);
+                }
+            }
+
+            if (alternateEmails) {
+                // Split by comma and clean each email
+                const alternates = alternateEmails.split(',');
+                alternates.forEach(email => {
+                    const cleanEmail = email.split(/[A-Z][a-z]+/)[0].trim();
+                    if (cleanEmail && cleanEmail.includes('@') && !emails.includes(cleanEmail)) {
+                        emails.push(cleanEmail);
+                    }
+                });
+            }
+
+            return emails.slice(0, 5); // Limit to 5 emails
+        }
+
+        // Render leads
+        function renderLeads(filteredLeads = null) {
+            const container = document.getElementById('leads-container');
+            const leadsToRender = filteredLeads || leads;
+
+            if (leadsToRender.length === 0) {
+                container.innerHTML = '<div class="no-results">No leads found</div>';
+                return;
+            }
+
+            container.innerHTML = leadsToRender.map((lead, index) => {
+                const status = leadStatuses[lead.google_place_id] || 'pending';
+                const comments = leadComments[lead.google_place_id] || [];
+                const emails = extractEmails(lead.primary_email, lead.alternate_emails);
+
+                return `
+                    <div class="lead-card">
+                        <div class="lead-content">
+                            <div class="lead-header">
+                                <div class="lead-title">
+                                    <h3>${lead.hotel_name}</h3>
+                                    <div class="rating">
+                                        ⭐ ${lead.google_rating} (${lead.user_ratings_total.toLocaleString()} reviews)
+                                    </div>
+                                </div>
+                                ${lead.star_segment ? `<span class="star-segment">${lead.star_segment}</span>` : ''}
+                            </div>
+
+                            <div class="contact-info">
+                                <p>📍 ${lead.full_address}</p>
+                                ${lead.primary_phone ? `<p>📞 <a href="tel:${lead.primary_phone}">${lead.primary_phone}</a></p>` : ''}
+                                ${lead.website ? `<p>🌐 <a href="${lead.website}" target="_blank">Visit Website</a></p>` : ''}
+                            </div>
+
+                            ${lead.notes ? `
+                            <div class="about">
+                                <h4>Notes</h4>
+                                <p>${lead.notes}</p>
+                            </div>
+                            ` : ''}
+
+                            ${emails.length > 0 ? `
+                            <div class="emails">
+                                <h4>Email Contacts</h4>
+                                <div class="email-tags">
+                                    ${emails.map(email => `<span class="email-tag">${email}</span>`).join('')}
+                                </div>
+                            </div>
+                            ` : ''}
+
+                            <div class="status-section">
+                                <select class="status-select ${status}" onchange="updateStatus('${lead.google_place_id}', this.value)">
+                                    <option value="pending" ${status === 'pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="contacted" ${status === 'contacted' ? 'selected' : ''}>Contacted</option>
+                                    <option value="interested" ${status === 'interested' ? 'selected' : ''}>Interested</option>
+                                    <option value="converted" ${status === 'converted' ? 'selected' : ''}>Converted</option>
+                                </select>
+
+                                <div class="comments">
+                                    <h4>Comments</h4>
+                                    <div class="comment-list">
+                                        ${comments.map(comment => `
+                                            <div class="comment">
+                                                <div>${comment.text}</div>
+                                                <div class="comment-time">${new Date(comment.time).toLocaleString()}</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <textarea class="comment-input" id="comment-${lead.google_place_id}" placeholder="Add a comment..."></textarea>
+                                    <button class="add-comment-btn" onclick="addComment('${lead.google_place_id}')">Add Comment</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update status
+        function updateStatus(id, status) {
+            leadStatuses[id] = status;
+            saveToStorage();
+            updateStats();
+            renderLeads(getFilteredLeads());
+        }
+
+        // Add comment
+        function addComment(id) {
+            const input = document.getElementById(`comment-${id}`);
+            const text = input.value.trim();
+
+            if (text) {
+                if (!leadComments[id]) leadComments[id] = [];
+                leadComments[id].unshift({
+                    text: text,
+                    time: new Date().toISOString()
+                });
+                input.value = '';
+                saveToStorage();
+                renderLeads(getFilteredLeads());
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = leads.length;
+            const contacted = Object.values(leadStatuses).filter(s => s === 'contacted').length;
+            const interested = Object.values(leadStatuses).filter(s => s === 'interested').length;
+            const converted = Object.values(leadStatuses).filter(s => s === 'converted').length;
+
+            document.getElementById('total-leads').textContent = total;
+            document.getElementById('contacted').textContent = contacted;
+            document.getElementById('interested').textContent = interested;
+            document.getElementById('converted').textContent = converted;
+        }
+
+        // Get filtered leads
+        function getFilteredLeads() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const statusFilter = document.getElementById('status-filter').value;
+            const ratingFilter = parseFloat(document.getElementById('rating-filter').value);
+
+            return leads.filter(lead => {
+                const matchSearch = !search ||
+                    lead.hotel_name.toLowerCase().includes(search) ||
+                    lead.full_address.toLowerCase().includes(search);
+
+                const matchStatus = !statusFilter ||
+                    (leadStatuses[lead.google_place_id] || 'pending') === statusFilter;
+
+                const matchRating = ratingFilter === 0 || lead.google_rating >= ratingFilter;
+
+                return matchSearch && matchStatus && matchRating;
+            });
+        }
+
+        // Apply filters
+        function applyFilters() {
+            renderLeads(getFilteredLeads());
+        }
+
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('search').value = '';
+            document.getElementById('status-filter').value = '';
+            document.getElementById('rating-filter').value = '0';
+            renderLeads();
+        }
+
+        // Event listeners
+        document.getElementById('search').addEventListener('input', applyFilters);
+        document.getElementById('status-filter').addEventListener('change', applyFilters);
+        document.getElementById('rating-filter').addEventListener('change', applyFilters);
+
+        // Load leads on page load
+        loadLeads();
+    </script>
+</body>
+</html>
